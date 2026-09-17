@@ -10,6 +10,7 @@
 #   SITEGROUND_KEY    the private key, including its BEGIN/END lines
 #   SITEGROUND_PATH   e.g. /home/customer/www/sociallab.com.au/public_html/
 #   SITEGROUND_PORT   optional, SiteGround usually uses 18765
+#   SITEGROUND_KEY_PASS  optional, only if the key was created with a password
 
 name: Deploy to SiteGround
 
@@ -52,6 +53,8 @@ jobs:
           remote_user: ${{ secrets.SITEGROUND_USER }}
           remote_port: ${{ secrets.SITEGROUND_PORT || 18765 }}
           remote_key: ${{ secrets.SITEGROUND_KEY }}
+          # Only needed if the SiteGround key was created with a password.
+          remote_key_pass: ${{ secrets.SITEGROUND_KEY_PASS }}
 
       - name: Where it landed
         run: |
