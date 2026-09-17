@@ -1,17 +1,27 @@
-# Builds the site and uploads it to SiteGround on every push to main.
+# Builds the site and uploads it to SiteGround.
 #
-# Add these repository secrets in GitHub → Settings → Secrets and variables → Actions:
-#   SITEGROUND_HOST      e.g. giowg1234.siteground.biz
-#   SITEGROUND_USER      the SFTP user from SiteGround → Site Tools → Devs → SFTP
-#   SITEGROUND_KEY       the private key for that SFTP user (whole file contents)
-#   SITEGROUND_PATH      e.g. /home/customer/www/sociallab.com.au/public_html/
+# Run it from the Actions tab → "Deploy to SiteGround" → "Run workflow", and pick:
+#   preview  → uploads to public_html/preview/ (safe: touches nothing else)
+#   live     → uploads to public_html/ itself
+#
+# Repository secrets required (Settings → Secrets and variables → Actions):
+#   SITEGROUND_HOST   SSH hostname from Site Tools → Devs → SSH Keys Manager
+#   SITEGROUND_USER   SSH username from the same page
+#   SITEGROUND_KEY    the private key, including its BEGIN/END lines
+#   SITEGROUND_PATH   e.g. /home/customer/www/sociallab.com.au/public_html/
+#   SITEGROUND_PORT   optional, SiteGround usually uses 18765
 
 name: Deploy to SiteGround
 
-# Manual for now: the first deploy writes into public_html, so we run it
-# deliberately rather than on every push. Switch to `push:` once it is proven.
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to deploy'
+        required: true
+        default: preview
+        type: choice
+        options: [preview, live]
 
 jobs:
   deploy:
@@ -24,14 +34,26 @@ jobs:
           python-version: '3.12'
 
       - name: Build site
-        run: python3 build.py
+        run: |
+          if [ "${{ inputs.target }}" = "preview" ]; then
+            python3 build.py --base=/preview
+          else
+            python3 build.py
+          fi
 
       - name: Upload to SiteGround
         uses: burnett01/rsync-deployments@7.0.1
         with:
+          # No --delete: nothing already on the server is removed.
           switches: -avzr --exclude='storage/' --exclude='api/config.local.php'
           path: dist/
-          remote_path: ${{ secrets.SITEGROUND_PATH }}
+          remote_path: ${{ secrets.SITEGROUND_PATH }}${{ inputs.target == 'preview' && 'preview/' || '' }}
           remote_host: ${{ secrets.SITEGROUND_HOST }}
           remote_user: ${{ secrets.SITEGROUND_USER }}
+          remote_port: ${{ secrets.SITEGROUND_PORT || 18765 }}
           remote_key: ${{ secrets.SITEGROUND_KEY }}
+
+      - name: Where it landed
+        run: |
+          echo "Deployed to: ${{ inputs.target }}"
+          echo "Path: ${{ secrets.SITEGROUND_PATH }}${{ inputs.target == 'preview' && 'preview/' || '' }}"

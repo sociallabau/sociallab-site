@@ -6,8 +6,9 @@ Takes the page bodies in pages/, wraps them in templates/base.html, expands any
 {{include ...}} partials, and writes plain HTML into dist/ ready to upload to
 SiteGround. Python standard library only — nothing to install.
 
-    python3 build.py           build into dist/
-    python3 build.py --serve   build, then serve dist/ on http://localhost:8000
+    python3 build.py               build into dist/
+    python3 build.py --serve       build, then serve dist/ on http://localhost:8000
+    python3 build.py --base=/preview   build for a subfolder, e.g. a staging deploy
 """
 
 from __future__ import annotations
@@ -136,12 +137,19 @@ def expand_includes(body: str) -> str:
 
 # ----------------------------------------------------------------------- build
 
-def build() -> None:
+def apply_base(markup: str, base: str) -> str:
+    """Rewrite root-relative links so the site can live in a subfolder."""
+    if not base:
+        return markup
+    return re.sub(r'(href|src|action)="/(?!/)', rf'\1="{base}/', markup)
+
+
+def build(base: str = "") -> None:
     if DIST.exists():
         shutil.rmtree(DIST)
     DIST.mkdir(parents=True)
 
-    base = (TEMPLATES / "base.html").read_text()
+    shell = (TEMPLATES / "base.html").read_text()
 
     # Cache-bust CSS/JS using file size, so browsers pick up every change.
     css_v = (ROOT / "assets/css/site.css").stat().st_size
@@ -163,7 +171,7 @@ def build() -> None:
         out_path = meta.get("path", "/" + page_file.stem + "/")
         canonical = SITE["site_url"] + out_path
 
-        html_out = base
+        html_out = shell
         replacements = {
             "title": meta.get("title", "Social Lab"),
             "description": meta.get("description", ""),
@@ -190,18 +198,27 @@ def build() -> None:
             target = DIST / out_path.lstrip("/")
 
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(html_out)
+        target.write_text(apply_base(html_out, base))
         print(f"  built {out_path:<28} → {target.relative_to(ROOT)}")
 
     # Static files, the PHP form endpoint and server config.
     shutil.copytree(ROOT / "assets", DIST / "assets")
     shutil.copytree(ROOT / "api", DIST / "api")
-    for extra in ("static/.htaccess", "static/robots.txt", "static/sitemap.xml"):
-        source = ROOT / extra
-        if source.exists():
-            shutil.copy(source, DIST / Path(extra).name)
+    if base:
+        # A staging copy: no canonical redirects, and keep it out of Google.
+        (DIST / ".htaccess").write_text(
+            "ErrorDocument 404 " + base + "/404.html\n"
+            "Options -Indexes\n"
+            '<FilesMatch "\\.(jsonl|log)$">\n  Require all denied\n</FilesMatch>\n'
+        )
+        (DIST / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
+    else:
+        for extra in ("static/.htaccess", "static/robots.txt", "static/sitemap.xml"):
+            source = ROOT / extra
+            if source.exists():
+                shutil.copy(source, DIST / Path(extra).name)
 
-    print(f"\n✓ Built {len(pages)} pages into dist/")
+    print(f"\n✓ Built {len(pages)} pages into dist/" + (f" (base {base})" if base else ""))
 
 
 def serve(port: int = 8000) -> None:
@@ -218,6 +235,7 @@ def serve(port: int = 8000) -> None:
 
 
 if __name__ == "__main__":
-    build()
+    base_arg = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--base=")), "")
+    build(base_arg.rstrip("/"))
     if "--serve" in sys.argv:
         serve()
