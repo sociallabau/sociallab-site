@@ -8,9 +8,9 @@
 
 name: Deploy to SiteGround
 
+# Manual for now: the first deploy writes into public_html, so we run it
+# deliberately rather than on every push. Switch to `push:` once it is proven.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       - name: Upload to SiteGround
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avzr --delete --exclude='storage/' --exclude='api/config.local.php'
+          switches: -avzr --exclude='storage/' --exclude='api/config.local.php'
           path: dist/
           remote_path: ${{ secrets.SITEGROUND_PATH }}
           remote_host: ${{ secrets.SITEGROUND_HOST }}
