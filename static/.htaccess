@@ -1,0 +1,61 @@
+# Social Lab — SiteGround (Apache) configuration
+
+# ---------------------------------------------------------------- HTTPS + www
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Strip www
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# ------------------------------------------------- redirects from the old site
+# The Framer site's sections no longer exist; send their traffic somewhere useful.
+Redirect 301 /media /property-marketing/
+Redirect 301 /brand /ecosystem/
+Redirect 301 /digital-brand /ecosystem/
+Redirect 301 /digital /ecosystem/
+Redirect 301 /podcast /ecosystem/
+Redirect 301 /services /
+Redirect 301 /contact-us /contact/
+
+# --------------------------------------------------------------- clean URLs
+# /ecosystem → /ecosystem/ so the directory index is served
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*[^/])$ /$1/ [R=301,L]
+
+ErrorDocument 404 /404.html
+
+# ------------------------------------------------------------------ security
+# Lead backups are written here by api/enquiry.php — never serve them.
+<FilesMatch "\.(jsonl|log)$">
+  Require all denied
+</FilesMatch>
+
+# Config holds the Growth Hub key; PHP files are executed, never listed.
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ------------------------------------------------------------------- caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png  "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType text/css   "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/html  "access plus 1 hour"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<link rel="canonical" href="{{canonical}}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Social Lab">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:image" content="{{og_image}}">
+<meta property="og:url" content="{{canonical}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1c1a17">
+
+<link rel="icon" href="/assets/img/brand/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/brand/sociallab-logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap">
+<link rel="stylesheet" href="/assets/css/site.css?v={{css_v}}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Social Lab",
+  "description": "Marketing agency for the property industry — content, social media management, advertising campaigns, photography, video and floor plans.",
+  "url": "{{site_url}}",
+  "email": "{{email}}",
+  "telephone": "{{phone_link}}",
+  "foundingDate": "2017",
+  "areaServed": "Gold Coast, Queensland, Australia",
+  "address": { "@type": "PostalAddress", "addressRegion": "QLD", "addressCountry": "AU" },
+  "sameAs": ["{{instagram}}"]
+}
+</script>
+</head>
+<body>
+
+<header class="header" id="site-header">
+  <div class="wrap header__inner">
+    <a class="logo" href="/" aria-label="Social Lab home">
+      <img src="/assets/img/brand/sociallab-logo.png" alt="Social Lab">
+    </a>
+
+    <nav class="nav" aria-label="Main">
+{{nav}}
+    </nav>
+
+    <div class="header__cta">
+      <a class="btn btn--rust" href="/contact/">Enquire now</a>
+      <button class="burger" type="button" aria-label="Menu" aria-expanded="false" id="burger"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+{{mobile_nav}}
+  <a class="btn btn--rust btn--lg" href="/contact/">Enquire now</a>
+</div>
+
+<main>
+{{content}}
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src="/assets/img/brand/sociallab-logo.png" alt="Social Lab">
+        <p>Marketing for the property industry. We create the content, post it for you and run all your ads.</p>
+      </div>
+
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/ecosystem/">The Ecosystem</a></li>
+          <li><a href="/property-marketing/">Property Marketing</a></li>
+          <li><a href="/property-marketing/#rate-card">Request the rate card</a></li>
+          <li><a href="/#results">Results</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="{{instagram}}" target="_blank" rel="noopener">Instagram</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li>
+            <a href="mailto:digital@sociallab.com.au">Elijah Arnold</a>
+            <span class="small muted"> · Director</span><br>
+            <a class="small" href="tel:+61459224408">0459 224 408</a>
+          </li>
+          <li>
+            <a href="mailto:chloe@sociallab.com.au">Chloe Dolan</a>
+            <span class="small muted"> · Marketing Manager</span><br>
+            <a class="small" href="tel:+61477002951">0477 002 951</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>Social Lab © Established 2017 · Gold Coast, Australia</span>
+      <span>Modern marketing done right.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="sticky-cta">
+  <a class="btn btn--ghost" href="tel:{{phone_link}}">Call us</a>
+  <a class="btn btn--rust" href="/contact/">Enquire now</a>
+</div>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox__close" type="button" aria-label="Close">&times;</button>
+  <img src="" alt="">
+</div>
+
+<script src="/assets/js/site.js?v={{js_v}}" defer></script>
+</body>
+</html>
