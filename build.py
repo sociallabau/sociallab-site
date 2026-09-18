@@ -105,13 +105,13 @@ def render_form(attrs: dict[str, str]) -> str:
         "extra_fields": "\n".join(extras),
         "note": attrs.get(
             "note",
-            "We reply within one business day. You will hear from Elijah or Chloe — "
+            "We reply within one business day. You will hear from Elijah or Chloe, "
             "not an automated sales sequence.",
         ),
         "success": attrs.get("success", "Enquiry received."),
         "success_body": attrs.get(
             "success_body",
-            "Thanks — we have your details and will be in touch within one business day.",
+            "Thanks, we have your details. We will be in touch within one business day.",
         ),
         "arrow": ARROW,
     }
