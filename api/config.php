@@ -26,8 +26,9 @@ $config = [
     // Every enquiry is emailed to these addresses.
     'lead_recipients' => ['digital@sociallab.com.au'],
 
-    // Link emailed/handed out after a rate card request.
-    'rate_card_url'   => 'https://social-lab-rate-card.lovable.app/',
+    // Link emailed after a rate card request. Empty = the auto-reply promises
+    // a follow-up instead, so no half-private link goes out by accident.
+    'rate_card_url'   => '',
 
     // Growth Hub webhook — set in config.local.php once the endpoint exists.
     'growth_hub_url'    => '',

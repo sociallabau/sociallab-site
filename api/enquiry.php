@@ -184,7 +184,7 @@ $ackSubject = $wantsRateCard
 
 $ackLines = ["Hi {$lead['name']},", ''];
 
-if ($wantsRateCard) {
+if ($wantsRateCard && !empty($config['rate_card_url'])) {
     $ackLines[] = 'Thanks for requesting our property marketing rate card. Here it is:';
     $ackLines[] = '';
     $ackLines[] = $config['rate_card_url'];
@@ -192,6 +192,13 @@ if ($wantsRateCard) {
     $ackLines[] = 'It covers photography, video, twilight shoots, floor plans, reels and our Social Boost add-on, with a calculator so you can build your own package.';
     $ackLines[] = '';
     $ackLines[] = 'If you would like us to put a package together for a specific listing, just reply to this email or call us.';
+} elseif ($wantsRateCard) {
+    // No rate card URL configured yet — promise a follow-up instead of sending a dead link.
+    $ackLines[] = 'Thanks for requesting our property marketing rate card.';
+    $ackLines[] = '';
+    $ackLines[] = 'One of us will send it through shortly, along with anything specific to the listing you mentioned.';
+    $ackLines[] = '';
+    $ackLines[] = 'If it is urgent, call us on ' . $config['phone'] . '.';
 } else {
     $ackLines[] = 'Thanks for reaching out. We have your enquiry and one of us will be in touch within one business day.';
     $ackLines[] = '';
