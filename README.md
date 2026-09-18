@@ -62,7 +62,8 @@ Framer paths (`/media`, `/brand`, `/podcast`, …) to the new pages.
 Every enquiry:
 
 1. is emailed to the addresses in `config.local.php`,
-2. is POSTed to the Growth Hub webhook when `growth_hub_url` is set,
+2. is POSTed to the Growth Hub webhook when `growth_hub_url` is set (off for
+   now; see `docs/growth-hub-lead-endpoint.ts.txt` for the endpoint it expects),
 3. triggers an automatic reply to the enquirer — and for rate card requests, that
    reply contains the rate card link,
 4. is appended to `storage/leads.jsonl` as a backup.

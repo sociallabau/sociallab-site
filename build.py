@@ -70,55 +70,94 @@ ATTR_RE = re.compile(r'(\w+)="([^"]*)"')
 INCLUDE_RE = re.compile(r"\{\{include\s+([\w.-]+)([^}]*)\}\}")
 
 
+FIELDS = {
+    "name":     ('<label for="{id}-name">Name <span class="req">*</span></label>'
+                 '<input type="text" id="{id}-name" name="name" autocomplete="name" required>'
+                 '<span class="field__error">Please tell us your name.</span>'),
+    "email":    ('<label for="{id}-email">Email <span class="req">*</span></label>'
+                 '<input type="email" id="{id}-email" name="email" autocomplete="email" required>'
+                 '<span class="field__error">Please enter a valid email address.</span>'),
+    "phone":    ('<label for="{id}-phone">Phone <span class="req">*</span></label>'
+                 '<input type="tel" id="{id}-phone" name="phone" autocomplete="tel" required>'
+                 '<span class="field__error">Please enter a contact number.</span>'),
+    "business_type": ('<label for="{id}-business">Business type</label>'
+                 '<select id="{id}-business" name="business_type"><option value="">Select…</option>'
+                 '<option>Real estate agent</option><option>Real estate agency / principal</option>'
+                 '<option>Buyers agent</option><option>Construction / builder / developer</option>'
+                 '<option>Property adjacent business</option><option>Other</option></select>'),
+    "business_name": ('<label for="{id}-business-name">Agency / business name</label>'
+                 '<input type="text" id="{id}-business-name" name="business_name" autocomplete="organization">'),
+    "area":     ('<label for="{id}-area">Core suburb / area</label>'
+                 '<input type="text" id="{id}-area" name="area" placeholder="e.g. Palm Beach, Gold Coast">'),
+    "address":  ('<label for="{id}-address">Property details / brief</label>'
+                 '<textarea id="{id}-address" name="address" placeholder="Address, property type, and what you need shot."></textarea>'),
+    "timing":   ('<label for="{id}-timing">Ideal day and time</label>'
+                 '<input type="text" id="{id}-timing" name="timing" placeholder="e.g. Thursday afternoon, or twilight this week">'),
+    "message":  ('<label for="{id}-message">Tell us a bit more</label>'
+                 '<textarea id="{id}-message" name="message" placeholder="Where you are at now, and what you are trying to achieve."></textarea>'),
+}
+
+FULL_WIDTH = {"address", "message", "interest", "timing"}
+
+
 def render_form(attrs: dict[str, str]) -> str:
-    """Render the enquiry form partial with the options this page needs."""
-    template = (TEMPLATES / "form.html").read_text()
-
+    """Render the enquiry form with just the fields this page asks for."""
     fid = attrs.get("id", "enquiry")
+    source = attrs.get("source", "Website enquiry")
+    wanted = [f.strip() for f in attrs.get(
+        "fields", "name|email|phone|business_type|business_name|area|message").split("|") if f.strip()]
 
-    # interest_options="A|B|C"
-    options = "\n".join(
-        f"          <option>{html.escape(option.strip())}</option>"
-        for option in attrs.get("interest_options", "").split("|")
-        if option.strip()
-    )
-
-    # extra="address:Property address|timing:When do you need it"
-    extras = []
-    for item in attrs.get("extra", "").split("|"):
-        if ":" not in item:
+    blocks = []
+    for key in wanted:
+        if key == "interest":
+            options = "".join(
+                f"<option>{html.escape(o.strip())}</option>"
+                for o in attrs.get("interest_options", "").split("|") if o.strip())
+            if not options:
+                continue
+            label = attrs.get("interest_label", "What can we help with?")
+            blocks.append(
+                f'      <div class="field field--full">\n'
+                f'        <label for="{fid}-interest">{html.escape(label)}</label>\n'
+                f'        <select id="{fid}-interest" name="interest"><option value="">Select…</option>{options}</select>\n'
+                f'      </div>')
             continue
-        name, label = item.split(":", 1)
-        extras.append(
-            f"""      <div class="field">
-        <label for="{fid}-{name.strip()}">{html.escape(label.strip())}</label>
-        <input type="text" id="{fid}-{name.strip()}" name="{name.strip()}">
-      </div>"""
-        )
+        if key not in FIELDS:
+            continue
+        css = "field field--full" if key in FULL_WIDTH else "field"
+        blocks.append(f'      <div class="{css}">\n        {FIELDS[key].format(id=fid)}\n      </div>')
 
-    values = {
-        "id": fid,
-        "source": attrs.get("source", "Website enquiry"),
-        "submit": attrs.get("submit", "Send enquiry"),
-        "interest_label": attrs.get("interest_label", "What can we help with?"),
-        "interest_options": options,
-        "extra_fields": "\n".join(extras),
-        "note": attrs.get(
-            "note",
-            "We reply within one business day. You will hear from Elijah or Chloe, "
-            "not an automated sales sequence.",
-        ),
-        "success": attrs.get("success", "Enquiry received."),
-        "success_body": attrs.get(
-            "success_body",
-            "Thanks, we have your details. We will be in touch within one business day.",
-        ),
-        "arrow": ARROW,
-    }
+    note = attrs.get("note", "")
+    note_html = f'      <p class="form-note">{html.escape(note)}</p>\n' if note else ""
 
-    for key, value in values.items():
-        template = template.replace("{{" + key + "}}", value)
-    return template
+    return f"""<div class="form-panel" id="form-{fid}">
+  <form class="enquiry-form" method="post" action="/api/enquiry.php" novalidate data-source="{html.escape(source)}">
+    <input type="hidden" name="source" value="{html.escape(source)}">
+    <input type="hidden" name="elapsed" value="0" data-elapsed>
+    <input type="hidden" name="page" value="" data-page>
+    <div class="form-hp" aria-hidden="true">
+      <label for="{fid}-company">Company (leave blank)</label>
+      <input type="text" id="{fid}-company" name="company" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="form-grid">
+{chr(10).join(blocks)}
+    </div>
+
+    <div class="form-foot">
+{note_html}      <button class="btn btn--rust btn--lg" type="submit">{html.escape(attrs.get("submit", "Send enquiry"))}{ARROW}</button>
+    </div>
+
+    <div class="form-status" role="alert"></div>
+  </form>
+
+  <div class="form-success">
+    <div class="tick">✓</div>
+    <h3 class="h3">{html.escape(attrs.get("success", "Enquiry received."))}</h3>
+    <p class="lede" style="margin: 12px auto 0;">{html.escape(attrs.get("success_body", "Thanks, we have your details. We will be in touch within one business day."))}</p>
+  </div>
+</div>
+"""
 
 
 def expand_includes(body: str) -> str:

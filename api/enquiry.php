@@ -199,11 +199,11 @@ if ($wantsRateCard && !empty($config['rate_card_url'])) {
     $ackLines[] = '';
     $ackLines[] = 'One of us will send it through shortly, along with anything specific to the listing you mentioned.';
     $ackLines[] = '';
-    $ackLines[] = 'If it is urgent, call us on ' . $config['phone'] . '.';
+    $ackLines[] = 'If anything is urgent, just reply to this email.';
 } else {
     $ackLines[] = 'Thanks for reaching out. We have your enquiry and one of us will be in touch within one business day.';
     $ackLines[] = '';
-    $ackLines[] = 'In the meantime, if it is urgent you can call us on ' . $config['phone'] . '.';
+    $ackLines[] = 'In the meantime, if anything is urgent, just reply to this email.';
 }
 
 $ackLines[] = '';

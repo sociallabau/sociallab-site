@@ -11,7 +11,7 @@ return [
     // Link sent out automatically when someone requests the rate card.
     'rate_card_url'   => 'https://sociallab.com.au/rate-card/',
 
-    // Social Lab Growth Hub — the endpoint that should receive each lead.
+    // Growth Hub webhook, when there is an endpoint to post to.
     'growth_hub_url'    => '',
     'growth_hub_secret' => '',
 ];

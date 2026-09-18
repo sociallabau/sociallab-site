@@ -30,7 +30,10 @@ $config = [
     // a follow-up instead, so no half-private link goes out by accident.
     'rate_card_url'   => '',
 
-    // Growth Hub webhook — set in config.local.php once the endpoint exists.
+    // Growth Hub webhook. Left empty on purpose: the Lovable plan does not
+    // allow environment secrets yet, so leads are emailed and added by hand.
+    // Setting a URL here turns the integration back on; the endpoint this
+    // expects is kept in docs/growth-hub-lead-endpoint.ts.txt.
     'growth_hub_url'    => '',
     'growth_hub_secret' => '',
 ];
