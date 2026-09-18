@@ -8,7 +8,11 @@ SiteGround. Python standard library only — nothing to install.
 
     python3 build.py               build into dist/
     python3 build.py --serve       build, then serve dist/ on http://localhost:8000
-    python3 build.py --base=/preview   build for a subfolder, e.g. a staging deploy
+    python3 build.py --base=/preview --out=dist-preview
+                                   build for a subfolder, into its own directory
+
+Deploy builds go to their own --out directory so dist/ always stays as the
+local preview expects it: a deploy can never leave localhost unstyled.
 """
 
 from __future__ import annotations
@@ -182,10 +186,11 @@ def apply_base(markup: str, base: str) -> str:
     return re.sub(r'(href|src|action)="/(?!/)', rf'\1="{base}/', markup)
 
 
-def build(base: str = "") -> None:
-    if DIST.exists():
-        shutil.rmtree(DIST)
-    DIST.mkdir(parents=True)
+def build(base: str = "", out: Path | None = None) -> None:
+    dist = out or DIST
+    if dist.exists():
+        shutil.rmtree(dist)
+    dist.mkdir(parents=True)
 
     shell = (TEMPLATES / "base.html").read_text()
 
@@ -228,34 +233,34 @@ def build(base: str = "") -> None:
             html_out = html_out.replace("{{" + key + "}}", value)
 
         if out_path == "/":
-            target = DIST / "index.html"
+            target = dist / "index.html"
         elif out_path.endswith("/"):
-            target = DIST / out_path.strip("/") / "index.html"
+            target = dist / out_path.strip("/") / "index.html"
         else:  # e.g. /404.html
-            target = DIST / out_path.lstrip("/")
+            target = dist / out_path.lstrip("/")
 
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(apply_base(html_out, base))
         print(f"  built {out_path:<28} → {target.relative_to(ROOT)}")
 
     # Static files, the PHP form endpoint and server config.
-    shutil.copytree(ROOT / "assets", DIST / "assets")
-    shutil.copytree(ROOT / "api", DIST / "api")
+    shutil.copytree(ROOT / "assets", dist / "assets")
+    shutil.copytree(ROOT / "api", dist / "api")
     if base:
         # A staging copy: no canonical redirects, and keep it out of Google.
-        (DIST / ".htaccess").write_text(
+        (dist / ".htaccess").write_text(
             "ErrorDocument 404 " + base + "/404.html\n"
             "Options -Indexes\n"
             '<FilesMatch "\\.(jsonl|log)$">\n  Require all denied\n</FilesMatch>\n'
         )
-        (DIST / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
+        (dist / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
     else:
         for extra in ("static/.htaccess", "static/robots.txt", "static/sitemap.xml"):
             source = ROOT / extra
             if source.exists():
-                shutil.copy(source, DIST / Path(extra).name)
+                shutil.copy(source, dist / Path(extra).name)
 
-    print(f"\n✓ Built {len(pages)} pages into dist/" + (f" (base {base})" if base else ""))
+    print(f"\n✓ Built {len(pages)} pages into {dist.name}/" + (f" (base {base})" if base else ""))
 
 
 def serve(port: int = 8000) -> None:
@@ -273,6 +278,7 @@ def serve(port: int = 8000) -> None:
 
 if __name__ == "__main__":
     base_arg = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--base=")), "")
-    build(base_arg.rstrip("/"))
+    out_arg = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--out=")), "")
+    build(base_arg.rstrip("/"), Path(out_arg) if out_arg else None)
     if "--serve" in sys.argv:
         serve()
