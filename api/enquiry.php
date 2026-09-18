@@ -142,6 +142,7 @@ $sent = false;
 foreach ($config['lead_recipients'] as $recipient) {
     $sent = mail($recipient, $subject, $body, implode("\r\n", $headers)) || $sent;
 }
+$lead['mail_accepted'] = $sent;
 
 // Keep a local copy of every lead as a backup, in case mail delivery fails.
 $logDir = __DIR__ . '/../storage';
@@ -215,9 +216,4 @@ $ackLines[] = $config['site_url'];
     'Content-Type: text/plain; charset=UTF-8',
 ]));
 
-respond(
-    true,
-    $wantsRateCard
-        ? 'Rate card on its way — check your inbox.'
-        : 'Thanks, we have your enquiry.'
-);
+respond(true, 'Thanks, we have your enquiry.');
