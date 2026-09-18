@@ -145,7 +145,7 @@
         })
         .catch(function (error) {
           status.className = 'form-status is-error';
-          status.textContent = error.message + ' You can also email digital@sociallab.com.au directly.';
+          status.textContent = error.message + ' Please try again in a moment.';
         })
         .finally(function () {
           form.classList.remove('is-submitting');

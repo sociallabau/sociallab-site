@@ -29,7 +29,6 @@ DIST = ROOT / "dist"
 SITE = {
     "site_name": "Social Lab",
     "site_url": "https://sociallab.com.au",
-    "email": "digital@sociallab.com.au",
     "phone": "0459 224 408",
     "phone_link": "+61459224408",
     "instagram": "https://www.instagram.com/sociallabau/",
@@ -154,7 +153,7 @@ def render_form(attrs: dict[str, str]) -> str:
   <div class="form-success">
     <div class="tick">✓</div>
     <h3 class="h3">{html.escape(attrs.get("success", "Enquiry received."))}</h3>
-    <p class="lede" style="margin: 12px auto 0;">{html.escape(attrs.get("success_body", "Thanks, we have your details. We will be in touch within one business day."))}</p>
+    <p class="lede" style="margin: 12px auto 0;">{html.escape(attrs.get("success_body", "Thanks, we have your details. We will be in touch shortly."))}</p>
   </div>
 </div>
 """
@@ -223,7 +222,6 @@ def build(base: str = "") -> None:
             "js_v": str(js_v),
             "instagram": SITE["instagram"],
             "phone_link": SITE["phone_link"],
-            "email": SITE["email"],
             "site_url": SITE["site_url"],
         }
         for key, value in replacements.items():
