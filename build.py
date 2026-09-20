@@ -187,7 +187,8 @@ def apply_base(markup: str, base: str) -> str:
 
 
 def build(base: str = "", out: Path | None = None) -> None:
-    dist = out or DIST
+    # Resolve so the progress lines below can always print a path relative to ROOT.
+    dist = (ROOT / out) if out and not out.is_absolute() else (out or DIST)
     if dist.exists():
         shutil.rmtree(dist)
     dist.mkdir(parents=True)
