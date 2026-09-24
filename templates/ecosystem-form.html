@@ -1,0 +1,140 @@
+<div class="quiz" data-quiz>
+  <form class="quiz__form" method="post" action="/api/enquiry.php" novalidate data-source="Ecosystem ad page">
+    <input type="hidden" name="source" value="Ecosystem ad page">
+    <input type="hidden" name="elapsed" value="0" data-elapsed>
+    <input type="hidden" name="page" value="" data-page>
+    <input type="hidden" name="utm_source" value="">
+    <input type="hidden" name="utm_medium" value="">
+    <input type="hidden" name="utm_campaign" value="">
+    <input type="hidden" name="utm_content" value="">
+    <input type="hidden" name="utm_term" value="">
+    <div class="form-hp" aria-hidden="true">
+      <label>Company (leave blank)<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <p class="quiz__meta">3 quick questions &middot; about a minute</p>
+    <span class="sr-only" data-count aria-live="polite">Step 1 of 3</span>
+    <div class="dots" data-dots aria-hidden="true"><i></i><b></b><i></i><b></b><i></i></div>
+
+    <!-- Step 1: who are you -->
+    <div class="step" data-step="1">
+      <h3 class="step__title" tabindex="-1">{{heading}}</h3>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="business_type" value="Real estate agent" data-group="gci"><span>Real estate agent</span></label>
+        <label class="opt"><input type="radio" name="business_type" value="Agency / principal" data-group="gci"><span>Agency principal</span></label>
+        <label class="opt"><input type="radio" name="business_type" value="Buyers agent" data-group="secured"><span>Buyers agent</span></label>
+        <label class="opt"><input type="radio" name="business_type" value="Construction / builder / developer" data-group="builder"><span>Construction, builder or developer</span></label>
+        <label class="opt"><input type="radio" name="business_type" value="Finance / mortgage / property adjacent" data-group="adjacent"><span>Finance, mortgage or property-adjacent business</span></label>
+      </div>
+      <p class="step__error" data-error hidden>Pick the one that fits best to continue.</p>
+    </div>
+
+    <!-- Step 2: one screening question, chosen by the answer above -->
+    <div class="step" data-step="2" hidden>
+      <div class="qgroup" data-qgroup="gci" hidden>
+        <h3 class="step__title" tabindex="-1">What was your GCI last year?</h3>
+        <p class="step__hint">Ballpark is fine. Principals, use the agency's figure.</p>
+        <div class="opts opts--grid">
+          <label class="opt"><input type="radio" name="gci" value="Under $150k" disabled><span>Under $150k</span></label>
+          <label class="opt"><input type="radio" name="gci" value="$150k to $300k" disabled><span>$150k to $300k</span></label>
+          <label class="opt"><input type="radio" name="gci" value="$300k to $500k" disabled><span>$300k to $500k</span></label>
+          <label class="opt"><input type="radio" name="gci" value="$500k to $1M" disabled><span>$500k to $1M</span></label>
+          <label class="opt"><input type="radio" name="gci" value="$1M+" disabled><span>$1M+</span></label>
+        </div>
+      </div>
+
+      <div class="qgroup" data-qgroup="secured" hidden>
+        <h3 class="step__title" tabindex="-1">How many properties did you secure last year?</h3>
+        <p class="step__hint">A rough number is fine.</p>
+        <div class="opts opts--grid">
+          <label class="opt"><input type="radio" name="properties_secured" value="Under 10" disabled><span>Under 10</span></label>
+          <label class="opt"><input type="radio" name="properties_secured" value="10 to 24" disabled><span>10 to 24</span></label>
+          <label class="opt"><input type="radio" name="properties_secured" value="25 to 49" disabled><span>25 to 49</span></label>
+          <label class="opt"><input type="radio" name="properties_secured" value="50 to 99" disabled><span>50 to 99</span></label>
+          <label class="opt"><input type="radio" name="properties_secured" value="100+" disabled><span>100+</span></label>
+        </div>
+      </div>
+
+      <div class="qgroup" data-qgroup="builder" hidden>
+        <h3 class="step__title" tabindex="-1">How big is the business?</h3>
+        <p class="step__hint">Ballpark is fine.</p>
+        <fieldset class="qset">
+          <legend>Team size</legend>
+          <div class="opts opts--grid">
+            <label class="opt"><input type="radio" name="team_size" value="Just me" disabled><span>Just me</span></label>
+            <label class="opt"><input type="radio" name="team_size" value="2 to 5" disabled><span>2 to 5</span></label>
+            <label class="opt"><input type="radio" name="team_size" value="6 to 15" disabled><span>6 to 15</span></label>
+            <label class="opt"><input type="radio" name="team_size" value="16 to 50" disabled><span>16 to 50</span></label>
+            <label class="opt"><input type="radio" name="team_size" value="50+" disabled><span>50+</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="qset">
+          <legend>Annual revenue</legend>
+          <div class="opts opts--grid">
+            <label class="opt"><input type="radio" name="revenue" value="Under $1M" disabled><span>Under $1M</span></label>
+            <label class="opt"><input type="radio" name="revenue" value="$1M to $3M" disabled><span>$1M to $3M</span></label>
+            <label class="opt"><input type="radio" name="revenue" value="$3M to $5M" disabled><span>$3M to $5M</span></label>
+            <label class="opt"><input type="radio" name="revenue" value="$5M to $10M" disabled><span>$5M to $10M</span></label>
+            <label class="opt"><input type="radio" name="revenue" value="$10M+" disabled><span>$10M+</span></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="qgroup" data-qgroup="adjacent" hidden>
+        <h3 class="step__title" tabindex="-1">Roughly what's your annual revenue?</h3>
+        <p class="step__hint">Ballpark is fine.</p>
+        <div class="opts opts--grid">
+          <label class="opt"><input type="radio" name="revenue" value="Under $250k" disabled><span>Under $250k</span></label>
+          <label class="opt"><input type="radio" name="revenue" value="$250k to $500k" disabled><span>$250k to $500k</span></label>
+          <label class="opt"><input type="radio" name="revenue" value="$500k to $1M" disabled><span>$500k to $1M</span></label>
+          <label class="opt"><input type="radio" name="revenue" value="$1M to $3M" disabled><span>$1M to $3M</span></label>
+          <label class="opt"><input type="radio" name="revenue" value="$3M+" disabled><span>$3M+</span></label>
+        </div>
+      </div>
+      <p class="step__error" data-error hidden>Pick an option to continue.</p>
+    </div>
+
+    <!-- Step 3: contact details -->
+    <div class="step" data-step="3" hidden>
+      <h3 class="step__title" tabindex="-1">Where can Emily reach you?</h3>
+      <p class="step__hint">Emily from our team will give you a quick call, about 5 minutes, to see if The Ecosystem is a fit.</p>
+      <div class="qfields">
+        <div class="qfield">
+          <label>Your name <span class="req">*</span><input type="text" name="name" autocomplete="name" required></label>
+          <span class="field__error">Please tell us your name.</span>
+        </div>
+        <div class="qfield">
+          <label>Mobile <span class="req">*</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel" required></label>
+          <span class="field__error">Please enter a contact number.</span>
+        </div>
+        <div class="qfield qfield--full">
+          <label>Email <span class="req">*</span><input type="email" name="email" autocomplete="email" required></label>
+          <span class="field__error">Please enter a valid email address.</span>
+        </div>
+        <div class="qfield">
+          <label>Business or agency name<input type="text" name="business_name" autocomplete="organization"></label>
+        </div>
+        <div class="qfield">
+          <label>Core suburb or area<input type="text" name="area" placeholder="e.g. Burleigh Heads"></label>
+        </div>
+      </div>
+      <button class="btn btn--rust btn--lg btn--block" type="submit">{{submit}}<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="quiz__fine">No obligation. We only use your details to get in touch about The Ecosystem.</p>
+    </div>
+
+    <div class="quiz__nav" data-nav hidden>
+      <button class="quiz__back" type="button" data-back>&larr; Back</button>
+      <button class="btn btn--ghost quiz__next" type="button" data-next>Continue</button>
+    </div>
+
+    <div class="form-status" role="alert"></div>
+    <noscript><p class="form-status is-error">This form needs JavaScript. Call {{phone}} and we'll sort it out over the phone.</p></noscript>
+  </form>
+
+  <div class="quiz__done" data-done hidden>
+    <div class="tick">&#10003;</div>
+    <h3 data-done-title>Got it. Thanks.</h3>
+    <p>Emily from our team will be in touch shortly for a quick 5 minute chat to see if The Ecosystem is a fit for your business.</p>
+    <p class="quiz__done-next">Keep your phone handy.</p>
+  </div>
+</div>

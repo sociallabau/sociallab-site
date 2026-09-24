@@ -98,6 +98,17 @@ $lead = [
     'address'       => field('address', 200),
     'timing'        => field('timing', 120),
     'message'       => $message,
+    // Screening answers from the Ecosystem ad page: which ones arrive depends on the business type.
+    'gci'                => field('gci', 60),
+    'properties_secured' => field('properties_secured', 60),
+    'team_size'          => field('team_size', 60),
+    'revenue'            => field('revenue', 60),
+    // Ad tracking, so every lead can be traced back to the campaign and ad that produced it.
+    'utm_source'    => field('utm_source', 120),
+    'utm_medium'    => field('utm_medium', 120),
+    'utm_campaign'  => field('utm_campaign', 120),
+    'utm_content'   => field('utm_content', 120),
+    'utm_term'      => field('utm_term', 120),
     'source'        => field('source', 80) ?: 'Website enquiry',
     'page'          => field('page', 200),
     'submitted_at'  => date('c'),
@@ -111,9 +122,14 @@ $wantsRateCard = str_contains(strtolower($lead['source']), 'rate card');
 
 $labels = [
     'name' => 'Name', 'email' => 'Email', 'phone' => 'Phone',
-    'business_type' => 'Business type', 'business_name' => 'Agency / business',
+    'business_type' => 'Business type',
+    'gci' => "Last year's GCI", 'properties_secured' => 'Secured last year',
+    'team_size' => 'Team size', 'revenue' => 'Annual revenue',
+    'business_name' => 'Agency / business',
     'area' => 'Core suburb / area', 'interest' => 'Interested in',
     'address' => 'Property address', 'timing' => 'Timing', 'message' => 'Message',
+    'utm_source' => 'Ad source', 'utm_medium' => 'Ad medium', 'utm_campaign' => 'Campaign',
+    'utm_content' => 'Ad', 'utm_term' => 'Ad term',
 ];
 
 $lines = ["New enquiry via {$lead['source']}", str_repeat('=', 46), ''];
@@ -129,7 +145,14 @@ $lines[] = 'Time: ' . date('D j M Y, g:ia', strtotime($lead['submitted_at']));
 $lines[] = 'Reply to: ' . $lead['email'];
 
 $body    = implode("\n", $lines);
-$subject = sprintf('[Lead] %s — %s', $lead['source'], $lead['name']);
+// Put the size of the business in the subject line, so the best-fit leads stand out in the inbox.
+$tier    = $lead['gci'] ?: ($lead['properties_secured'] ?: ($lead['revenue'] ?: $lead['team_size']));
+$subject = sprintf(
+    '[Lead] %s — %s%s',
+    $lead['source'],
+    $lead['name'],
+    $tier !== '' ? " ({$lead['business_type']}, {$tier})" : ''
+);
 
 $headers = [
     'From: Social Lab Website <no-reply@sociallab.com.au>',
@@ -200,6 +223,12 @@ if ($wantsRateCard && !empty($config['rate_card_url'])) {
     $ackLines[] = 'One of us will send it through shortly, along with anything specific to the listing you mentioned.';
     $ackLines[] = '';
     $ackLines[] = 'If anything is urgent, just reply to this email.';
+} elseif (str_contains(strtolower($lead['source']), 'ecosystem ad page')) {
+    $ackLines[] = 'Thanks for your interest in The Ecosystem. We have your answers.';
+    $ackLines[] = '';
+    $ackLines[] = 'Emily from our team will be in touch shortly for a quick 5 minute chat, to see if The Ecosystem is a fit for your business.';
+    $ackLines[] = '';
+    $ackLines[] = 'In the meantime, if anything is urgent, just reply to this email.';
 } else {
     $ackLines[] = 'Thanks for reaching out. We have your enquiry and one of us will be in touch within one business day.';
     $ackLines[] = '';

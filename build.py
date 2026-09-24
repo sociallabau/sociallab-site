@@ -193,16 +193,19 @@ def build(base: str = "", out: Path | None = None) -> None:
         shutil.rmtree(dist)
     dist.mkdir(parents=True)
 
-    shell = (TEMPLATES / "base.html").read_text()
-
     # Cache-bust CSS/JS using file size, so browsers pick up every change.
     css_v = (ROOT / "assets/css/site.css").stat().st_size
     js_v = (ROOT / "assets/js/site.js").stat().st_size
+    landing_css_v = (ROOT / "assets/css/landing.css").stat().st_size
+    landing_js_v = (ROOT / "assets/js/landing.js").stat().st_size
 
     pages = sorted(PAGES.glob("*.html"))
     for page_file in pages:
         meta, body = parse_page(page_file.read_text())
         body = expand_includes(body)
+        # `template: landing` in the front matter swaps the site header, footer and nav for the
+        # stripped-back ad landing template (templates/landing.html).
+        shell = (TEMPLATES / f"{meta.get('template', 'base')}.html").read_text()
 
         nav_links = "\n".join(
             f'        <a href="{href}"{" class=\"is-active\"" if meta.get("section") == key else ""}>{label}</a>'
@@ -226,7 +229,11 @@ def build(base: str = "", out: Path | None = None) -> None:
             "content": body,
             "css_v": str(css_v),
             "js_v": str(js_v),
+            "landing_css_v": str(landing_css_v),
+            "landing_js_v": str(landing_js_v),
+            "robots": meta.get("robots", "index,follow"),
             "instagram": SITE["instagram"],
+            "phone": SITE["phone"],
             "phone_link": SITE["phone_link"],
             "site_url": SITE["site_url"],
         }

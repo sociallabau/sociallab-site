@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="robots" content="{{robots}}">
+<link rel="canonical" href="{{canonical}}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Social Lab">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:image" content="{{og_image}}">
+<meta property="og:url" content="{{canonical}}">
+<meta name="theme-color" content="#5a493e">
+
+<link rel="icon" href="/assets/img/brand/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/brand/sociallab-logo.png">
+
+<link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces (the secondary display serif) loads without blocking the page; Georgia shows until it arrives. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,24..144,480;1,24..144,480&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,24..144,480;1,24..144,480&display=swap"></noscript>
+<link rel="stylesheet" href="/assets/css/landing.css?v={{landing_css_v}}">
+<script>document.documentElement.className += ' js';</script>
+
+<!-- Ad tracking: paste the Meta Pixel and/or Google tag snippet here.
+     landing.js already fires fbq('track', 'Lead') and gtag('event', 'generate_lead')
+     when the form is submitted successfully, so no extra event code is needed. -->
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top__inner">
+    <a class="logo" href="/ecosystem-plan/" aria-label="Social Lab">
+      <img src="/assets/img/brand/sociallab-logo.png" alt="Social Lab" width="148" height="39">
+    </a>
+  </div>
+</header>
+
+<main>
+{{content}}
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <p>Social Lab © Established 2017 · Gold Coast, Australia</p>
+    <p class="foot__fine">Results shown are from individual clients and will vary. <a href="/privacy/">Privacy policy</a></p>
+  </div>
+</footer>
+
+<div class="sticky" data-sticky aria-hidden="true">
+  <a class="btn btn--peach btn--block" href="#apply" tabindex="-1">See if it's a fit</a>
+</div>
+
+<script src="/assets/js/landing.js?v={{landing_js_v}}" defer></script>
+</body>
+</html>
