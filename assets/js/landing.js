@@ -240,21 +240,4 @@
       }
     }, { once: true });
   });
-
-  // Same facade-to-player swap as above, for testimonials hosted as a plain mp4
-  // instead of Wistia — keeps the play button identical either way.
-  document.querySelectorAll('[data-video]').forEach(function (facade) {
-    facade.addEventListener('click', function () {
-      var video = document.createElement('video');
-      video.src = facade.dataset.video;
-      video.controls = true;
-      video.playsInline = true;
-      video.autoplay = true;
-      video.style.width = '100%';
-      video.style.height = '100%';
-      video.style.display = 'block';
-      facade.replaceWith(video);
-      video.play();
-    }, { once: true });
-  });
 })();
