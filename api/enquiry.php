@@ -100,6 +100,7 @@ $lead = [
     'message'       => $message,
     // Screening answers from the Ecosystem ad page: which ones arrive depends on the business type.
     'gci'                => field('gci', 60),
+    'agents_in_office'   => field('agents_in_office', 60),
     'properties_secured' => field('properties_secured', 60),
     'team_size'          => field('team_size', 60),
     'revenue'            => field('revenue', 60),
@@ -123,7 +124,7 @@ $wantsRateCard = str_contains(strtolower($lead['source']), 'rate card');
 $labels = [
     'name' => 'Name', 'email' => 'Email', 'phone' => 'Phone',
     'business_type' => 'Business type',
-    'gci' => "Last year's GCI", 'properties_secured' => 'Secured last year',
+    'gci' => "Last year's GCI", 'agents_in_office' => 'Agents in office', 'properties_secured' => 'Secured last year',
     'team_size' => 'Team size', 'revenue' => 'Annual revenue',
     'business_name' => 'Agency / business',
     'area' => 'Core suburb / area', 'interest' => 'Interested in',
@@ -146,7 +147,7 @@ $lines[] = 'Reply to: ' . $lead['email'];
 
 $body    = implode("\n", $lines);
 // Put the size of the business in the subject line, so the best-fit leads stand out in the inbox.
-$tier    = $lead['gci'] ?: ($lead['properties_secured'] ?: ($lead['revenue'] ?: $lead['team_size']));
+$tier    = $lead['gci'] ?: ($lead['agents_in_office'] ?: ($lead['properties_secured'] ?: ($lead['revenue'] ?: $lead['team_size'])));
 $subject = sprintf(
     '[Lead] %s — %s%s',
     $lead['source'],

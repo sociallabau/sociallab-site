@@ -21,7 +21,7 @@
       <h3 class="step__title" tabindex="-1">{{heading}}</h3>
       <div class="opts">
         <label class="opt"><input type="radio" name="business_type" value="Real estate agent" data-group="gci"><span>Real estate agent</span></label>
-        <label class="opt"><input type="radio" name="business_type" value="Agency / principal" data-group="gci"><span>Agency principal</span></label>
+        <label class="opt"><input type="radio" name="business_type" value="Agency / principal" data-group="office"><span>Agency principal</span></label>
         <label class="opt"><input type="radio" name="business_type" value="Buyers agent" data-group="secured"><span>Buyers agent</span></label>
         <label class="opt"><input type="radio" name="business_type" value="Construction / builder / developer" data-group="builder"><span>Construction, builder or developer</span></label>
         <label class="opt"><input type="radio" name="business_type" value="Finance / mortgage / property adjacent" data-group="adjacent"><span>Finance, mortgage or property-adjacent business</span></label>
@@ -33,13 +33,25 @@
     <div class="step" data-step="2" hidden>
       <div class="qgroup" data-qgroup="gci" hidden>
         <h3 class="step__title" tabindex="-1">What was your GCI last year?</h3>
-        <p class="step__hint">Ballpark is fine. Principals, use the agency's figure.</p>
+        <p class="step__hint">Ballpark is fine.</p>
         <div class="opts opts--grid">
           <label class="opt"><input type="radio" name="gci" value="Under $150k" disabled><span>Under $150k</span></label>
           <label class="opt"><input type="radio" name="gci" value="$150k to $300k" disabled><span>$150k to $300k</span></label>
           <label class="opt"><input type="radio" name="gci" value="$300k to $500k" disabled><span>$300k to $500k</span></label>
           <label class="opt"><input type="radio" name="gci" value="$500k to $1M" disabled><span>$500k to $1M</span></label>
           <label class="opt"><input type="radio" name="gci" value="$1M+" disabled><span>$1M+</span></label>
+        </div>
+      </div>
+
+      <div class="qgroup" data-qgroup="office" hidden>
+        <h3 class="step__title" tabindex="-1">How many agents are in your office?</h3>
+        <p class="step__hint">A rough number is fine.</p>
+        <div class="opts opts--grid">
+          <label class="opt"><input type="radio" name="agents_in_office" value="Under 5" disabled><span>Under 5</span></label>
+          <label class="opt"><input type="radio" name="agents_in_office" value="5 to 10" disabled><span>5 to 10</span></label>
+          <label class="opt"><input type="radio" name="agents_in_office" value="11 to 20" disabled><span>11 to 20</span></label>
+          <label class="opt"><input type="radio" name="agents_in_office" value="21 to 40" disabled><span>21 to 40</span></label>
+          <label class="opt"><input type="radio" name="agents_in_office" value="40+" disabled><span>40+</span></label>
         </div>
       </div>
 
