@@ -13,6 +13,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/gmail-smtp.php';
 
 $wantsJson = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
     || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
@@ -77,6 +78,7 @@ $name    = field('name', 120);
 $email   = mb_strtolower(field('email', 160));
 $phone   = field('phone', 40);
 $message = mb_substr(trim((string) ($_POST['message'] ?? '')), 0, 4000);
+$eventId = field('event_id', 100);
 
 $errors = [];
 if ($name === '')                                          { $errors[] = 'name'; }
@@ -155,16 +157,40 @@ $subject = sprintf(
     $tier !== '' ? " ({$lead['business_type']}, {$tier})" : ''
 );
 
-$headers = [
-    'From: Social Lab Website <no-reply@sociallab.com.au>',
-    'Reply-To: ' . $lead['name'] . ' <' . $lead['email'] . '>',
-    'Content-Type: text/plain; charset=UTF-8',
-    'X-Mailer: sociallab.com.au',
-];
-
 $sent = false;
-foreach ($config['lead_recipients'] as $recipient) {
-    $sent = mail($recipient, $subject, $body, implode("\r\n", $headers)) || $sent;
+if (!empty($config['gmail_smtp_app_password'])) {
+    if (!is_dir(__DIR__ . '/../storage')) { @mkdir(__DIR__ . '/../storage', 0755, true); }
+    foreach ($config['lead_recipients'] as $recipient) {
+        try {
+            sendViaGmailSmtp(
+                $config['gmail_smtp_user'],
+                $config['gmail_smtp_app_password'],
+                $recipient,
+                $subject,
+                $body,
+                $lead['name'] . ' <' . $lead['email'] . '>'
+            );
+            $sent = true;
+        } catch (Throwable $e) {
+            @file_put_contents(
+                __DIR__ . '/../storage/gmail-smtp-errors.log',
+                date('c') . ' ' . $e->getMessage() . "\n",
+                FILE_APPEND
+            );
+        }
+    }
+} else {
+    // Falls back to the server's own mail() until a Gmail app password is set —
+    // see api/config.local.example.php.
+    $headers = [
+        'From: Social Lab Website <no-reply@sociallab.com.au>',
+        'Reply-To: ' . $lead['name'] . ' <' . $lead['email'] . '>',
+        'Content-Type: text/plain; charset=UTF-8',
+        'X-Mailer: sociallab.com.au',
+    ];
+    foreach ($config['lead_recipients'] as $recipient) {
+        $sent = mail($recipient, $subject, $body, implode("\r\n", $headers)) || $sent;
+    }
 }
 $lead['mail_accepted'] = $sent;
 
@@ -196,6 +222,74 @@ if (!empty($config['growth_hub_url'])) {
         @file_put_contents(
             $logDir . '/growth-hub-errors.log',
             date('c') . " status={$hubStatus} " . substr((string) $hubResponse, 0, 500) . "\n",
+            FILE_APPEND
+        );
+    }
+}
+
+// -------------------------------------------------------- meta pixel/CAPI --
+
+/** Meta wants lowercase-trimmed values hashed with sha256, hex-encoded. */
+function metaHash(string $value): string
+{
+    return hash('sha256', mb_strtolower(trim($value)));
+}
+
+/** Digits only, with the AU country code, per Meta's phone-matching spec. */
+function metaPhone(string $phone): string
+{
+    $digits = preg_replace('/\D+/', '', $phone) ?? '';
+    if (str_starts_with($digits, '0') && strlen($digits) === 10) {
+        $digits = '61' . substr($digits, 1);
+    }
+    return $digits;
+}
+
+if (!empty($config['meta_capi_token'])) {
+    $nameParts = preg_split('/\s+/', trim($lead['name']), 2);
+    $userData = array_filter([
+        'em'                => [metaHash($lead['email'])],
+        'ph'                => [metaHash(metaPhone($lead['phone']))],
+        'fn'                => isset($nameParts[0]) && $nameParts[0] !== '' ? [metaHash($nameParts[0])] : null,
+        'ln'                => isset($nameParts[1]) && $nameParts[1] !== '' ? [metaHash($nameParts[1])] : null,
+        'client_ip_address' => $ip !== 'unknown' ? $ip : null,
+        'client_user_agent' => $lead['user_agent'] !== '' ? $lead['user_agent'] : null,
+        'fbp'               => $_COOKIE['_fbp'] ?? null,
+        'fbc'               => $_COOKIE['_fbc'] ?? null,
+    ]);
+
+    $capiPayload = [
+        'data' => [[
+            'event_name'       => 'Lead',
+            'event_time'       => strtotime($lead['submitted_at']),
+            'event_id'         => $eventId !== '' ? $eventId : null,
+            'action_source'    => 'website',
+            'event_source_url' => $config['site_url'] . $lead['page'],
+            'user_data'        => $userData,
+            'custom_data'      => ['content_name' => $lead['source']],
+        ]],
+        'access_token' => $config['meta_capi_token'],
+    ];
+    if (!empty($config['meta_test_event_code'])) {
+        $capiPayload['test_event_code'] = $config['meta_test_event_code'];
+    }
+
+    $ch = curl_init("https://graph.facebook.com/v21.0/{$config['meta_pixel_id']}/events");
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode($capiPayload),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 8,
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+    ]);
+    $capiResponse = curl_exec($ch);
+    $capiStatus   = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+
+    if ($capiStatus < 200 || $capiStatus >= 300) {
+        @file_put_contents(
+            $logDir . '/meta-capi-errors.log',
+            date('c') . " status={$capiStatus} " . substr((string) $capiResponse, 0, 500) . "\n",
             FILE_APPEND
         );
     }

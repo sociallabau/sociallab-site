@@ -28,9 +28,24 @@
 <link rel="stylesheet" href="/assets/css/landing.css?v={{landing_css_v}}">
 <script>document.documentElement.className += ' js';</script>
 
-<!-- Ad tracking: paste the Meta Pixel and/or Google tag snippet here.
-     landing.js already fires fbq('track', 'Lead') and gtag('event', 'generate_lead')
-     when the form is submitted successfully, so no extra event code is needed. -->
+<!-- Meta Pixel. landing.js fires fbq('track', 'Lead') (with a matching eventID for
+     CAPI dedup) and gtag('event', 'generate_lead') once the form submits successfully,
+     so no extra event code is needed here. -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '{{meta_pixel_id}}');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id={{meta_pixel_id}}&ev=PageView&noscript=1"
+/></noscript>
 </head>
 <body>
 

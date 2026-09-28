@@ -24,7 +24,13 @@ $config = [
 
     // ------------------------------------------------------- lead routing
     // Every enquiry is emailed to these addresses.
-    'lead_recipients' => ['digital@sociallab.com.au'],
+    'lead_recipients' => ['digital@sociallab.com.au', 'emily@sociallab.com.au'],
+
+    // Sent through Gmail's own SMTP (not PHP's mail()), so it reliably shows as
+    // coming from this address instead of failing Gmail's DMARC check. Needs an
+    // app password in config.local.php — see api/config.local.example.php.
+    'gmail_smtp_user'         => 'sociallabau@gmail.com',
+    'gmail_smtp_app_password' => '',
 
     // Link emailed after a rate card request. Empty = the auto-reply promises
     // a follow-up instead, so no half-private link goes out by accident.
@@ -36,6 +42,17 @@ $config = [
     // expects is kept in docs/growth-hub-lead-endpoint.ts.txt.
     'growth_hub_url'    => '',
     'growth_hub_secret' => '',
+
+    // ---------------------------------------------------------- meta pixel
+    // Not a secret — a Pixel/Dataset ID is exposed client-side regardless.
+    'meta_pixel_id'        => '156315858303152',
+    // Conversions API access token (Events Manager -> Settings -> Conversions
+    // API -> Generate access token). Left empty on purpose: CAPI is skipped
+    // until this is set in config.local.php.
+    'meta_capi_token'      => '',
+    // Events Manager -> Test events tab. Leave empty outside of testing —
+    // Meta excludes events tagged with a test code from real reporting.
+    'meta_test_event_code' => '',
 ];
 
 // Local overrides (never committed).

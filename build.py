@@ -36,6 +36,10 @@ SITE = {
     "phone": "0459 224 408",
     "phone_link": "+61459224408",
     "instagram": "https://www.instagram.com/sociallabau/",
+    # Not a secret — a Pixel/Dataset ID is exposed client-side regardless.
+    # The Conversions API access token that pairs with it lives server-side
+    # only, in api/config.local.php (see api/config.local.example.php).
+    "meta_pixel_id": "156315858303152",
 }
 
 NAV = [
@@ -233,6 +237,7 @@ def build(base: str = "", out: Path | None = None) -> None:
             "landing_js_v": str(landing_js_v),
             "robots": meta.get("robots", "index,follow"),
             "instagram": SITE["instagram"],
+            "meta_pixel_id": SITE["meta_pixel_id"],
             "phone": SITE["phone"],
             "phone_link": SITE["phone_link"],
             "site_url": SITE["site_url"],

@@ -139,6 +139,11 @@
 
       form.querySelector('[data-elapsed]').value = Math.round((Date.now() - loadedAt) / 1000);
 
+      // Shared between the pixel's client-side Lead event and the server's Conversions
+      // API call, so Meta can dedupe the two instead of counting the lead twice.
+      var eventId = 'lead.' + Date.now() + '.' + Math.random().toString(36).slice(2, 10);
+      form.querySelector('[data-event-id]').value = eventId;
+
       var button = form.querySelector('button[type=submit]');
       var label = button.innerHTML;
       form.classList.add('is-submitting');
@@ -161,7 +166,7 @@
           quiz.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
 
           if (window.gtag) window.gtag('event', 'generate_lead', { form: form.dataset.source });
-          if (window.fbq) window.fbq('track', 'Lead', { content_name: form.dataset.source });
+          if (window.fbq) window.fbq('track', 'Lead', { content_name: form.dataset.source }, { eventID: eventId });
         })
         .catch(function (error) {
           status.className = 'form-status is-error';
