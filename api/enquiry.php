@@ -245,51 +245,62 @@ function metaPhone(string $phone): string
     return $digits;
 }
 
-if (!empty($config['meta_capi_token'])) {
-    $nameParts = preg_split('/\s+/', trim($lead['name']), 2);
-    $userData = array_filter([
-        'em'                => [metaHash($lead['email'])],
-        'ph'                => [metaHash(metaPhone($lead['phone']))],
-        'fn'                => isset($nameParts[0]) && $nameParts[0] !== '' ? [metaHash($nameParts[0])] : null,
-        'ln'                => isset($nameParts[1]) && $nameParts[1] !== '' ? [metaHash($nameParts[1])] : null,
-        'client_ip_address' => $ip !== 'unknown' ? $ip : null,
-        'client_user_agent' => $lead['user_agent'] !== '' ? $lead['user_agent'] : null,
-        'fbp'               => $_COOKIE['_fbp'] ?? null,
-        'fbc'               => $_COOKIE['_fbc'] ?? null,
-    ]);
+// Never let a Meta-side problem (missing curl extension, network hiccup, bad
+// token) take the whole enquiry down — the email and Growth Hub post above
+// have already happened by this point regardless of what happens here.
+if (!empty($config['meta_capi_token']) && function_exists('curl_init')) {
+    try {
+        $nameParts = preg_split('/\s+/', trim($lead['name']), 2);
+        $userData = array_filter([
+            'em'                => [metaHash($lead['email'])],
+            'ph'                => [metaHash(metaPhone($lead['phone']))],
+            'fn'                => isset($nameParts[0]) && $nameParts[0] !== '' ? [metaHash($nameParts[0])] : null,
+            'ln'                => isset($nameParts[1]) && $nameParts[1] !== '' ? [metaHash($nameParts[1])] : null,
+            'client_ip_address' => $ip !== 'unknown' ? $ip : null,
+            'client_user_agent' => $lead['user_agent'] !== '' ? $lead['user_agent'] : null,
+            'fbp'               => $_COOKIE['_fbp'] ?? null,
+            'fbc'               => $_COOKIE['_fbc'] ?? null,
+        ]);
 
-    $capiPayload = [
-        'data' => [[
-            'event_name'       => 'Lead',
-            'event_time'       => strtotime($lead['submitted_at']),
-            'event_id'         => $eventId !== '' ? $eventId : null,
-            'action_source'    => 'website',
-            'event_source_url' => $config['site_url'] . $lead['page'],
-            'user_data'        => $userData,
-            'custom_data'      => ['content_name' => $lead['source']],
-        ]],
-        'access_token' => $config['meta_capi_token'],
-    ];
-    if (!empty($config['meta_test_event_code'])) {
-        $capiPayload['test_event_code'] = $config['meta_test_event_code'];
-    }
+        $capiPayload = [
+            'data' => [[
+                'event_name'       => 'Lead',
+                'event_time'       => strtotime($lead['submitted_at']),
+                'event_id'         => $eventId !== '' ? $eventId : null,
+                'action_source'    => 'website',
+                'event_source_url' => $config['site_url'] . $lead['page'],
+                'user_data'        => $userData,
+                'custom_data'      => ['content_name' => $lead['source']],
+            ]],
+            'access_token' => $config['meta_capi_token'],
+        ];
+        if (!empty($config['meta_test_event_code'])) {
+            $capiPayload['test_event_code'] = $config['meta_test_event_code'];
+        }
 
-    $ch = curl_init("https://graph.facebook.com/v21.0/{$config['meta_pixel_id']}/events");
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => json_encode($capiPayload),
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 8,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-    ]);
-    $capiResponse = curl_exec($ch);
-    $capiStatus   = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
+        $ch = curl_init("https://graph.facebook.com/v21.0/{$config['meta_pixel_id']}/events");
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($capiPayload),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        ]);
+        $capiResponse = curl_exec($ch);
+        $capiStatus   = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        curl_close($ch);
 
-    if ($capiStatus < 200 || $capiStatus >= 300) {
+        if ($capiStatus < 200 || $capiStatus >= 300) {
+            @file_put_contents(
+                $logDir . '/meta-capi-errors.log',
+                date('c') . " status={$capiStatus} " . substr((string) $capiResponse, 0, 500) . "\n",
+                FILE_APPEND
+            );
+        }
+    } catch (Throwable $e) {
         @file_put_contents(
             $logDir . '/meta-capi-errors.log',
-            date('c') . " status={$capiStatus} " . substr((string) $capiResponse, 0, 500) . "\n",
+            date('c') . ' ' . $e->getMessage() . "\n",
             FILE_APPEND
         );
     }
