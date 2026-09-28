@@ -21,6 +21,7 @@ Redirect 301 /digital /ecosystem/
 Redirect 301 /podcast /ecosystem/
 Redirect 301 /services /
 Redirect 301 /contact-us /contact/
+Redirect 301 /ecosystem-plan /ecoapplication
 
 # --------------------------------------------------------------- clean URLs
 # /ecosystem → /ecosystem/ so the directory index is served
