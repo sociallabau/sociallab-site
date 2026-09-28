@@ -102,9 +102,10 @@ $lead = [
     'message'       => $message,
     // Screening answers from the Ecosystem ad page: which ones arrive depends on the business type.
     'gci'                => field('gci', 60),
-    'agents_in_office'   => field('agents_in_office', 60),
+    'properties_sold'    => field('properties_sold', 60),
     'properties_secured' => field('properties_secured', 60),
     'team_size'          => field('team_size', 60),
+    'projects_per_year'  => field('projects_per_year', 60),
     'revenue'            => field('revenue', 60),
     // Ad tracking, so every lead can be traced back to the campaign and ad that produced it.
     'utm_source'    => field('utm_source', 120),
@@ -126,8 +127,8 @@ $wantsRateCard = str_contains(strtolower($lead['source']), 'rate card');
 $labels = [
     'name' => 'Name', 'email' => 'Email', 'phone' => 'Phone',
     'business_type' => 'Business type',
-    'gci' => "Last year's GCI", 'agents_in_office' => 'Agents in office', 'properties_secured' => 'Secured last year',
-    'team_size' => 'Team size', 'revenue' => 'Annual revenue',
+    'gci' => "Last year's GCI", 'properties_sold' => 'Agency sales / year', 'properties_secured' => 'Secured last year',
+    'team_size' => 'Team size', 'projects_per_year' => 'Projects per year', 'revenue' => 'Annual revenue',
     'business_name' => 'Agency / business',
     'area' => 'Core suburb / area', 'interest' => 'Interested in',
     'address' => 'Property address', 'timing' => 'Timing', 'message' => 'Message',
@@ -149,7 +150,7 @@ $lines[] = 'Reply to: ' . $lead['email'];
 
 $body    = implode("\n", $lines);
 // Put the size of the business in the subject line, so the best-fit leads stand out in the inbox.
-$tier    = $lead['gci'] ?: ($lead['agents_in_office'] ?: ($lead['properties_secured'] ?: ($lead['revenue'] ?: $lead['team_size'])));
+$tier    = $lead['gci'] ?: ($lead['properties_sold'] ?: ($lead['properties_secured'] ?: ($lead['projects_per_year'] ?: ($lead['revenue'] ?: $lead['team_size']))));
 $subject = sprintf(
     '[Lead] %s — %s%s',
     $lead['source'],
@@ -236,7 +237,7 @@ function metaHash(string $value): string
 }
 
 /** Digits only, with the AU country code, per Meta's phone-matching spec. */
-function metaPhone(string $phone): string
+function metaNormalizePhone(string $phone): string
 {
     $digits = preg_replace('/\D+/', '', $phone) ?? '';
     if (str_starts_with($digits, '0') && strlen($digits) === 10) {
@@ -253,7 +254,7 @@ if (!empty($config['meta_capi_token']) && function_exists('curl_init')) {
         $nameParts = preg_split('/\s+/', trim($lead['name']), 2);
         $userData = array_filter([
             'em'                => [metaHash($lead['email'])],
-            'ph'                => [metaHash(metaPhone($lead['phone']))],
+            'ph'                => [metaHash(metaNormalizePhone($lead['phone']))],
             'fn'                => isset($nameParts[0]) && $nameParts[0] !== '' ? [metaHash($nameParts[0])] : null,
             'ln'                => isset($nameParts[1]) && $nameParts[1] !== '' ? [metaHash($nameParts[1])] : null,
             'client_ip_address' => $ip !== 'unknown' ? $ip : null,
