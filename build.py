@@ -220,14 +220,19 @@ def build(base: str = "", out: Path | None = None) -> None:
         )
 
         out_path = meta.get("path", "/" + page_file.stem + "/")
-        canonical = SITE["site_url"] + out_path
+        # A page served from its own subdomain (the ad page) sets its full URL in
+        # front matter, so share previews scrape the page people actually land on.
+        canonical = meta.get("canonical", SITE["site_url"] + out_path)
+        og_image = meta.get("og_image", "/assets/img/ecosystem/img3501.jpg")
+        if not og_image.startswith("http"):
+            og_image = SITE["site_url"] + og_image
 
         html_out = shell
         replacements = {
             "title": meta.get("title", "Social Lab"),
             "description": meta.get("description", ""),
             "canonical": canonical,
-            "og_image": SITE["site_url"] + meta.get("og_image", "/assets/img/ecosystem/img3501.jpg"),
+            "og_image": og_image,
             "nav": nav_links,
             "mobile_nav": mobile_links,
             "content": body,

@@ -199,7 +199,8 @@
   // On phones a bar follows the reader down the page once the form has scrolled out of view.
 
   var sticky = document.querySelector('[data-sticky]');
-  if (sticky && 'IntersectionObserver' in window) {
+  // Only where there's a form to scroll to — not on the privacy page.
+  if (sticky && quizzes.length && 'IntersectionObserver' in window) {
     var inView = {};
     var link = sticky.querySelector('a');
     var update = function () {
