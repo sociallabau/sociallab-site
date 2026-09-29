@@ -14,14 +14,18 @@ RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
 # ------------------------------------------------- redirects from the old site
 # The Framer site's sections no longer exist; send their traffic somewhere useful.
-Redirect 301 /media /property-marketing/
-Redirect 301 /brand /ecosystem/
-Redirect 301 /digital-brand /ecosystem/
-Redirect 301 /digital /ecosystem/
-Redirect 301 /podcast /ecosystem/
-Redirect 301 /services /
-Redirect 301 /contact-us /contact/
-Redirect 301 /ecosystem-plan /ecoapplication
+#
+# These are RedirectMatch with anchored patterns, NOT Redirect: plain Redirect
+# matches on prefix, so "Redirect /digital" would also catch the long-running
+# /digitalmarketing landing page and send it to /ecosystem/marketing.
+RedirectMatch 301 ^/media/?$         /property-marketing/
+RedirectMatch 301 ^/brand/?$         /ecosystem/
+RedirectMatch 301 ^/digital-brand/?$ /ecosystem/
+RedirectMatch 301 ^/digital/?$       /ecosystem/
+RedirectMatch 301 ^/podcast/?$       /ecosystem/
+RedirectMatch 301 ^/services/?$      /
+RedirectMatch 301 ^/contact-us/?$    /contact/
+RedirectMatch 301 ^/ecosystem-plan/?$ /ecoapplication/
 
 # --------------------------------------------------------------- clean URLs
 # /ecosystem → /ecosystem/ so the directory index is served

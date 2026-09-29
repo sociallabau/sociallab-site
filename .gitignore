@@ -12,5 +12,6 @@ storage/
 # macOS
 .DS_Store
 
-# Preview build output
+# Preview and live build output
 dist-preview/
+dist-live/
