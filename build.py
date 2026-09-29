@@ -238,6 +238,8 @@ def build(base: str = "", out: Path | None = None) -> None:
             "content": body,
             "css_v": str(css_v),
             "js_v": str(js_v),
+            # Landing pages CTA to their own #apply form; others need a real target.
+            "sticky_href": meta.get("sticky_href", "#apply"),
             "landing_css_v": str(landing_css_v),
             "landing_js_v": str(landing_js_v),
             "robots": meta.get("robots", "index,follow"),
