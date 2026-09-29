@@ -158,10 +158,15 @@ $subject = sprintf(
     $tier !== '' ? " ({$lead['business_type']}, {$tier})" : ''
 );
 
+// Route the lead to whoever owns that form.
+$routing    = $config['lead_routing'] ?? [];
+$recipients = $routing[$lead['source']] ?? $routing['default'] ?? $config['lead_recipients'];
+$lead['sent_to'] = implode(', ', $recipients);
+
 $sent = false;
 if (!empty($config['gmail_smtp_app_password'])) {
     if (!is_dir(__DIR__ . '/../storage')) { @mkdir(__DIR__ . '/../storage', 0755, true); }
-    foreach ($config['lead_recipients'] as $recipient) {
+    foreach ($recipients as $recipient) {
         try {
             sendViaGmailSmtp(
                 $config['gmail_smtp_user'],
@@ -189,7 +194,7 @@ if (!empty($config['gmail_smtp_app_password'])) {
         'Content-Type: text/plain; charset=UTF-8',
         'X-Mailer: sociallab.com.au',
     ];
-    foreach ($config['lead_recipients'] as $recipient) {
+    foreach ($recipients as $recipient) {
         $sent = mail($recipient, $subject, $body, implode("\r\n", $headers)) || $sent;
     }
 }

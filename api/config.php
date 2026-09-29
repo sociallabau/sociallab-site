@@ -23,8 +23,19 @@ $config = [
     ],
 
     // ------------------------------------------------------- lead routing
-    // Every enquiry is emailed to these addresses.
-    'lead_recipients' => ['digital@sociallab.com.au', 'emily@sociallab.com.au'],
+    // Who gets each form's leads, keyed by the form's `source` value. Any
+    // source not listed here falls through to 'default'.
+    'lead_routing' => [
+        'Ecosystem enquiry'          => ['digital@sociallab.com.au', 'chloe@sociallab.com.au'],
+        'Property marketing booking' => ['sales@sociallab.com.au'],
+        // Paid-ads applications keep going to Emily, who makes the call and is
+        // named in that form's acknowledgement email.
+        'Ecosystem ad page'          => ['digital@sociallab.com.au', 'emily@sociallab.com.au'],
+        'default'                    => ['sales@sociallab.com.au'],
+    ],
+
+    // Fallback if lead_routing is ever empty.
+    'lead_recipients' => ['sales@sociallab.com.au'],
 
     // Sent through Gmail's own SMTP (not PHP's mail()), so it reliably shows as
     // coming from this address instead of failing Gmail's DMARC check. Needs an
