@@ -140,6 +140,8 @@ h1 em, h2 em, h3 em {
 .hero__sub { max-width: 30em; margin: 22px auto 0; font-size: clamp(17px, 2vw, 21px); line-height: 1.5; color: rgba(249, 243, 232, 0.86); }
 .hero__sub strong { color: var(--warm); font-weight: 700; }
 .hero .formcard { margin-top: clamp(30px, 4vw, 44px); }
+.after-form { max-width: 34em; margin: 22px auto 0; font-size: 14px; line-height: 1.5; color: rgba(249, 243, 232, 0.78); }
+.after-form__title { margin-bottom: 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(249, 243, 232, 0.95); }
 @media (max-width: 599px) {
   .hero { padding-top: 76px; }
   .hero h1 { font-size: 42px; }
